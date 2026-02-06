@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .timer-display {
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 30px 0;
+            font-variant-numeric: tabular-nums;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+        }
+
+        .mode-display {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .work-mode {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .break-mode {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 140px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .btn-pause {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: white;
+        }
+
+        .timer-settings {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .setting {
+            text-align: center;
+        }
+
+        .setting label {
+            display: block;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .setting input {
+            width: 80px;
+            padding: 10px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            color: #f1f5f9;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .setting input:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+
+        .progress-container {
+            height: 8px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            width: 0%;
+            transition: width 1s linear;
+            border-radius: 4px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: block;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .timer-display {
+                font-size: 4rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .timer-settings {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍅 Pomodoro Timer</h1>
+        <p class="subtitle">Focus for 25 minutes, break for 5. Repeat.</p>
+        
+        <div class="mode-display work-mode" id="modeDisplay">WORK MODE</div>
+        
+        <div class="timer-display" id="timerDisplay">25:00</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn">
+                <span>▶</span> Start
+            </button>
+            <button class="btn btn-pause" id="pauseBtn" disabled>
+                <span>⏸</span> Pause
+            </button>
+            <button class="btn btn-reset" id="resetBtn">
+                <span>↺</span> Reset
+            </button>
+        </div>
+        
+        <div class="timer-settings">
+            <div class="setting">
+                <label for="workTime">Work (minutes)</label>
+                <input type="number" id="workTime" min="1" max="60" value="25">
+            </div>
+            <div class="setting">
+                <label for="breakTime">Break (minutes)</label>
+                <input type="number" id="breakTime" min="1" max="30" value="5">
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                Sessions Completed
+                <span class="stat-value" id="sessionsCount">0</span>
+            </div>
+            <div class="stat">
+                Total Focus Time
+                <span class="stat-value" id="totalTime">0 min</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PomodoroTimer {
+            constructor() {
+                this.workTime = 25 * 60; // 25 minutes in seconds
+                this.breakTime = 5 * 60; // 5 minutes in seconds
+                this.timeLeft = this.workTime;
+                this.isRunning = false;
+                this.isWorkMode = true;
+                this.timerInterval = null;
+                this.sessionsCompleted = 0;
+                this.totalFocusTime = 0;
+                
+                this.initializeElements();
+                this.attachEventListeners();
+                this.updateDisplay();
+            }
+            
+            initializeElements() {
+                this.timerDisplay = document.getElementById('timerDisplay');
+                this.modeDisplay = document.getElementById('modeDisplay');
+                this.progressBar = document.getElementById('progressBar');
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.workTimeInput = document.getElementById('workTime');
+                this.breakTimeInput = document.getElementById('breakTime');
+                this.sessionsCount = document.getElementById('sessionsCount');
+                this.totalTime = document.getElementById('totalTime');
+            }
+            
+            attachEventListeners() {
+                this.startBtn.addEventListener('click', () => this.start());
+                this.pauseBtn.addEventListener('click', () => this.pause());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                
+                this.workTimeInput.addEventListener('change', () => this.updateWorkTime());
+                this.breakTimeInput.addEventListener('change', () => this.updateBreakTime());
+            }
+            
+            start() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.startBtn.disabled = true;
+                this.pauseBtn.disabled = false;
+                
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateDisplay();
+                    
+                    if (this.timeLeft <= 0) {
+                        this.switchMode();
+                    }
+                }, 1000);
+            }
+            
+            pause() {
+                if (!this.isRunning) return;
+                
+                this.isRunning = false;
+                this.startBtn.disabled = false;
+                this.pauseBtn.disabled = true;
+                
+                clearInterval(this.timerInterval);
+            }
+            
+            reset() {
+                this.pause();
+                this.isWorkMode = true;
+                this.timeLeft = this.workTime;
+                this.updateDisplay();
+            }
+            
+            switchMode() {
+                this.pause();
+                
+                if (this.isWorkMode) {
+                    // Work session completed
+                    this.sessionsCompleted++;
+                    this.totalFocusTime += this.workTime / 60; // Add minutes
+                    this.updateStats();
+                    
+                    // Switch to break mode
+                    this.isWorkMode = false;
+                    this.timeLeft = this.breakTime;
+                    
+                    // Play notification sound (using Web Audio API)
+                    this.playNotificationSound();
+                    
+                    // Show notification
+                    this.showNotification("Break Time! 🎉", "Take a 5-minute break.");
+                } else {
+                    // Break completed, switch back to work
+                    this.isWorkMode = true;
+                    this.timeLeft = this.workTime;
+                    
+                    // Play notification sound
+                    this.playNotificationSound();
+                    
+                    // Show notification
+                    this.showNotification("Back to Work! 💪", "Focus for 25 minutes.");
+                }
+                
+                this.updateDisplay();
+                this.start(); // Auto-start next session
+            }
+            
+            updateDisplay() {
+                const minutes = Math.floor(this.timeLeft / 60);
+                const seconds = this.timeLeft % 60;
+                
+                this.timerDisplay.textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Update mode display
+                if (this.isWorkMode) {
+                    this.modeDisplay.textContent = "WORK MODE";
+                    this.modeDisplay.className = "mode-display work-mode";
+                } else {
+                    this.modeDisplay.textContent = "BREAK MODE";
+                    this.modeDisplay.className = "mode-display break-mode";
+                }
+                
+                // Update progress bar
+                const totalTime = this.isWorkMode ? this.workTime : this.breakTime;
+                const progress = ((totalTime - this.timeLeft) / totalTime) * 100;
+                this.progressBar.style.width = `${progress}%`;
+            }
+            
+            updateWorkTime() {
+                const minutes = parseInt(this.workTimeInput.value) || 25;
+                this.workTime = Math.min(Math.max(minutes, 1), 60) * 60;
+                
+                if (this.isWorkMode && !this.isRunning) {
+                    this.timeLeft = this.workTime;
+                    this.updateDisplay();
+                }
+            }
+            
+            updateBreakTime() {
+                const minutes = parseInt(this.breakTimeInput.value) || 5;
+                this.breakTime = Math.min(Math.max(minutes, 1), 30) * 60;
+                
+                if (!this.isWorkMode && !this.isRunning) {
+                    this.timeLeft = this.breakTime;
+                    this.updateDisplay();
+                }
+            }
+            
+            updateStats() {
+                this.sessionsCount.textContent = this.sessionsCompleted;
+                this.totalTime.textContent = `${this.totalFocusTime} min`;
+            }
+            
+            playNotificationSound() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                } catch (e) {
+                    console.log("Audio not supported");
+                }
+            }
+            
+            showNotification(title, message) {
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification(title, { body: message, icon: "🍅" });
+                }
+            }
+        }
+        
+        // Request notification permission
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+        
+        // Initialize timer when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.pomodoroTimer = new PomodoroTimer();
+        });
+    </script>
+</body>
+</html>

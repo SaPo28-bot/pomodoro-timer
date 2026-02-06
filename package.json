@@ -1,0 +1,23 @@
+{
+  "name": "pomodoro-timer",
+  "version": "1.0.0",
+  "description": "A clean, modern Pomodoro timer with dark theme",
+  "main": "pomodoro-simple.html",
+  "scripts": {
+    "start": "echo 'Open pomodoro-simple.html in your browser'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "pomodoro",
+    "timer",
+    "productivity",
+    "focus",
+    "time-management"
+  ],
+  "author": "SaPo28-bot",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SaPo28-bot/pomodoro-timer.git"
+  }
+}
